@@ -159,8 +159,3 @@ if __name__ == '__main__':
 	elif args.subparser=='plot':
 		from testNet import plot_var_db_size
 		plot_var_db_size(args.calc_fl, args.dbow_fl)
-
-
-
-
-

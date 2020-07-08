@@ -7,8 +7,8 @@ from time import time
 
 def conv(inpt, ks, stride=1, num_out=1, group=1, pad=0):
 	"""
-	Convolution layer definition. One filter is always the output's third dimmension, and there is never any zero pad, since we want a compact 
-	descriptor from the encoded image.
+	Convolution layer definition. One filter is always the output's third dimmension,
+	and there is never any zero pad, since we want a compact descriptor from the encoded image.
 	"""
 	conv = caffe.layers.Convolution(inpt, convolution_param=dict(kernel_size=ks, stride=stride, num_output=num_out, pad=pad, group=group), weight_filler=dict(type='gaussian', std=0.01), bias_filler=dict(type='gaussian',std=0.01)) 
 	return conv
@@ -40,7 +40,8 @@ def relu(inpt):
 
 def calc(X1_lmdb, X2_lmdb, data_root="", batch_size=256):
 	"""
-	Network definition and writing to prototxt from lmdb image database. Level Databases are very fast for training use.
+	Network definition and writing to prototxt from lmdb image database. 
+	Level Databases are very fast for training use.
 	"""
 	print 'Defining calc ...'
 	
@@ -53,9 +54,8 @@ def calc(X1_lmdb, X2_lmdb, data_root="", batch_size=256):
 		X1_path = data_root + X1_path
 		X2_path = data_root + X2_path
 
-	n.X1 = caffe.layers.Data(source=X1_path, backend=caffe.params.Data.LMDB, batch_size=batch_size, ntop=1, transform_param=dict(scale=1./255)) 	
-		
-	n.X2 = caffe.layers.Data(source=X2_path, backend=caffe.params.Data.LMDB, batch_size=batch_size, ntop=1, transform_param=dict(scale=1./255))  	
+	n.X1 = caffe.layers.Data(source=X1_path, backend=caffe.params.Data.LMDB, batch_size=batch_size, ntop=1, transform_param=dict(scale=1./255))
+	n.X2 = caffe.layers.Data(source=X2_path, backend=caffe.params.Data.LMDB, batch_size=batch_size, ntop=1, transform_param=dict(scale=1./255))
 
 	# encode
 	n.conv1 = conv(n.X1, 5, stride=2, num_out=64, pad=4)
@@ -111,10 +111,10 @@ layer {
 class CaffeSolver:
 
 	"""
-	Caffesolver is a class for creating a solver.prototxt file. It sets default
-	values and can export a solver parameter file.
-	Note that all parameters are stored as strings. Strings variables are
-	stored as strings in strings.
+	Caffesolver is a class for creating a solver.prototxt file. 
+	It sets default values and can export a solver parameter file.
+	Note that all parameters are stored as strings. 
+	Strings variables are stored as strings in strings.
 	"""
 
 	def __init__(self, m_iter, trainnet_prototxt_path="proto/train.prototxt", prefix='"calc"', debug=False):
@@ -153,8 +153,7 @@ class CaffeSolver:
 
 	def add_from_file(self, filepath):
 		"""
-		Reads a caffe solver prototxt file and updates the Caffesolver
-		instance parameters.
+		Reads a caffe solver prototxt file and updates the Caffesolver instance parameters.
 		"""
 		with open(filepath, 'r') as f:
 			for line in f:
@@ -188,7 +187,8 @@ def view_output_size():
 
 def create_net(X1_lmdb, X2_lmdb, max_iter='500000', batch_size=256, prefix='"calc"', data_root="", debugFlag=False):
 	"""
-	Define, and save the net. Note that max_iter is too high. This is to prevent undertraining. Since we have all the snapshots, we can cross-validate to find the best iteration
+	Define, and save the net. Note that max_iter is too high. This is to prevent undertraining. 
+	Since we have all the snapshots, we can cross-validate to find the best iteration
 	"""
 	train_proto, deploy_proto = calc(X1_lmdb, X2_lmdb, data_root=data_root, batch_size=batch_size) 
 	if not os.path.isdir("proto"):
@@ -201,13 +201,13 @@ def create_net(X1_lmdb, X2_lmdb, max_iter='500000', batch_size=256, prefix='"cal
 	solver = CaffeSolver(m_iter=max_iter, prefix=prefix, debug=debugFlag)
 	solver.write('proto/solver.prototxt') # create the solver proto as well
 	view_output_size()
-	print 'done'	
+	print 'done'
 
 def moveModel(model_dir=""):
 	"""
-	Movve the model and all of its snapshots to specified directory
+	Move the model and all of its snapshots to specified directory
 	"""
-	if not os.path.isdir("model/"+model_dir):
+	if not os.path.isdir("model/"+model_dir):#判断是否为目录,不是的话,则新建一个目录
 		os.makedirs("model/"+model_dir)
 	models = glob("*.caffemodel")
 	solverstates = glob("*.solverstate")
@@ -218,10 +218,10 @@ def moveModel(model_dir=""):
 
 def train(solver_proto_path, snapshot_solver_path=None, init_weights=None, GPU_ID=0):
 	"""
-	Train the defined net. While we did not use this function for our final net, we used the caffe executable for multi-gpu use, this was used for prototyping
+	Train the defined net. While we did not use this function for our final net, 
+	we used the caffe executable for multi-gpu use, this was used for prototyping
 	"""
 
-	import time
 	t0 = time.time()
 	caffe.set_mode_gpu()
 	caffe.set_device(GPU_ID)
@@ -238,5 +238,3 @@ def train(solver_proto_path, snapshot_solver_path=None, init_weights=None, GPU_I
 	model_dir = "calc_" +  time.strftime("%d-%m-%Y_%I%M%S")
 	moveModel(model_dir=model_dir) # move all the model files to a directory  
 	print "Moved model to model/"+model_dir
-
-

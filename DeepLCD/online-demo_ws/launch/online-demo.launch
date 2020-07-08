@@ -16,7 +16,7 @@
     </node>
 
     <!-- dummy frame -->
-    <node pkg="tf2_ros" type="static_transform_publisher" name="frame_0" args="0.0 0.0 0.0 0 0 0 1 world my_frame" />-->
+    <node pkg="tf2_ros" type="static_transform_publisher" name="frame_0" args="0.0 0.0 0.0 0 0 0 1 world my_frame" />
 
     <!-- Visualization -->
     <node pkg="rviz" type="rviz" name="rviz_deeplcd" args="-d $(find deeplcd)/../launch/rviz.rviz" /> 

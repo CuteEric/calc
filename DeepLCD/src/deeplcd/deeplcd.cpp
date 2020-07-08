@@ -21,24 +21,23 @@ DeepLCD::DeepLCD(const std::string& network_definition_file,
 	int gpu_id)
 	: db( Database() )
 {
-
 	std::string mode = "CPU";
-        if(gpu_id >= 0)
-        {
-                caffe::Caffe::set_mode(caffe::Caffe::GPU);
-                caffe::Caffe::SetDevice(gpu_id);
+	if(gpu_id >= 0)
+	{
+		caffe::Caffe::set_mode(caffe::Caffe::GPU);
+		caffe::Caffe::SetDevice(gpu_id);
 		mode = "GPU";
-        }
+	}
 	else 
 	{
 		caffe::Caffe::set_mode(caffe::Caffe::CPU);
 	}
 	clock_t begin = clock();
-        autoencoder = new caffe::Net<float>(network_definition_file, caffe::TEST);	
-        autoencoder->CopyTrainedLayersFrom(pre_trained_model_file);
-        clock_t end = clock();
+	autoencoder = new caffe::Net<float>(network_definition_file, caffe::TEST);	
+	autoencoder->CopyTrainedLayersFrom(pre_trained_model_file);
+	clock_t end = clock();
 	std::cout << "\nCaffe mode = " << mode << "\n";
-        std::cout << "Loaded model in " <<   double(end - begin) / CLOCKS_PER_SEC << " seconds\n";
+	std::cout << "Loaded model in " <<   double(end - begin) / CLOCKS_PER_SEC << " seconds\n";
 	autoencoder_input = autoencoder->input_blobs()[0]; // construct the input blob shared_ptr
 	autoencoder_output = autoencoder->output_blobs()[0]; // construct the output blob shared_ptr
 }
@@ -119,7 +118,6 @@ const float DeepLCD::score(const Vector& d1, const Vector& d2)
 
 const descriptor DeepLCD::calcDescr(const cv::Mat& im_)
 {
-
 	std::vector<cv::Mat> input_channels(1); //We need this wrapper to place data into the net. Allocate space for at most 3 channels	
 	int w = autoencoder_input->width();
 	int h = autoencoder_input->height();
