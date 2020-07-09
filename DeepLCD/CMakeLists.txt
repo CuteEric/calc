@@ -31,7 +31,7 @@ endif()
 
 MESSAGE("${GREEN}Using Caffe_ROOT_DIR: ${Caffe_ROOT_DIR}${ENDL}")
 set(Caffe_LIBS ${Caffe_ROOT_DIR}/build/lib/libcaffe.so)
-set(Caffe_INCLUDE_DIRS ${Caffe_ROOT_DIR}/build/install/include)
+set(Caffe_INCLUDE_DIRS ${Caffe_ROOT_DIR}/include)
 MESSAGE("Caffe_LIBS: ${Caffe_LIBS}")
 MESSAGE("Caffe_INCLUDE_DIRS: ${Caffe_INCLUDE_DIRS}")
 
