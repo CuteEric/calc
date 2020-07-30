@@ -1,8 +1,8 @@
 #include "deeplcd.h"
 
-
 #include "opencv2/highgui/highgui.hpp"
 #include "opencv2/imgproc/imgproc.hpp"
+#include "opencv2/objdetect/objdetect.hpp"
 #include "boost/filesystem.hpp"
 #include <ctime>
 #include <stdlib.h>
@@ -55,6 +55,10 @@ int main(int argc, char** argv)
 		comp_t_list.push_front(dt);  
 		std::cout << "Added Image " << id << " to database\n\n";
 	}
+
+	//HOGDescriptor *hog = new HOGDescriptor(cvSize(16, 32), cvSize(16, 16), cvSize(16, 16), cvSize(8, 8), 2, 1);
+    //std::vector<float> descriptors;
+    //hog->compute(cv::resize(im, im, cvSize(160, 120)), descriptors);
 	
 	std::cout << "\n----------------- Database Query -------------------------\n";
 

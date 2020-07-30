@@ -1,3 +1,5 @@
+# !usr/bin/env
+# coding=utf-8
 from glob import glob
 import cv2
 import numpy as np
@@ -54,22 +56,14 @@ def writeFileList(dirNameArr):
 def randPerspectiveWarp(im, w, h, r, ret_pts=False):
 
 	"""
-	Applies a pseudo-random perspective warp to an image. 
-
-	input: 
-
+	Applies a pseudo-random perspective warp to an image.
+	input:
 	im - the original image
-
 	h - image height
-	
 	w - image width
-
 	r - Random instance
-
 	returns:
-
 	im_warp - the warped image
-
 	ret_pts - if True, return the points generated 
 	""" 
 
@@ -102,7 +96,7 @@ def randPerspectiveWarp(im, w, h, r, ret_pts=False):
 	pts_orig[3, 1] = h
 
 	# random second plane
-	pts_warp[0, 0] = r.uniform(minsx[0], maxsx[0])
+	pts_warp[0, 0] = r.uniform(minsx[0], maxsx[0])#用于生成一个指定范围内的随机浮点数，两格参数中，其中一个是上限，一个是下限
 	pts_warp[0, 1] = r.uniform(minsy[0], maxsy[0])
 	
 	pts_warp[1, 0] = r.uniform(minsx[0], maxsx[0])
@@ -115,10 +109,10 @@ def randPerspectiveWarp(im, w, h, r, ret_pts=False):
 	pts_warp[3, 1] = r.uniform(minsy[1], maxsy[1])
 
 	# compute the 3x3 transform matrix based on the two planes of interest
-	T = cv2.getPerspectiveTransform(pts_warp, pts_orig)
+	T = cv2.getPerspectiveTransform(pts_warp, pts_orig)#获得透视变换矩阵
 
 	# apply the perspective transormation to the image, causing an automated change in viewpoint for the net's dual input
-	im_warp = cv2.warpPerspective(im, T, (w, h))
+	im_warp = cv2.warpPerspective(im, T, (w, h))#进行透视变换矩阵
 	if not ret_pts:
 		return im_warp
 	else: 
@@ -180,6 +174,8 @@ def showImWarpEx(im_fl, save):
 	if save:
 		cv2.imwrite("Warped.jpg", im_warp)
 		print "Images saved in current directory"
+	
+
 def calcNumBuff(w, h, n, n_comp, mem):
 	""" 
 	calculate the minimum number of buffers to use based on the capacity of system ram and gpu memory
@@ -274,6 +270,11 @@ def writeDatabase(outDBNames, files_list, w, h, data_root="", gpu_id=0, prev_mod
 				for i in bar: # index in files_list, which is n long
 					im_file = files_list[i]
 					im = cv2.imread(im_file)
+
+					#only for display
+					cv2.imshow("a", im)
+					cv2.waitKey(0)
+
 					while im is None: # Some images get corrupted sometimes. Check for this so that it doesnt crash a multi-day running process (sigh)
 						print "\n\n\nSkipping corrupted image:",im_file, ". Bootstrapping random image from dataset\n\n\n"
 						im_file = files_list[r.randint(0, n-1)]
@@ -308,14 +309,14 @@ def writeDatabase(outDBNames, files_list, w, h, data_root="", gpu_id=0, prev_mod
 					datum1.channels = chan
 					datum1.width = w
 					datum1.height = h
-					datum1.data = im1.tobytes() 
+					datum1.data = im1.tostring() 
 				
 					txn1.put(str_id, datum1.SerializeToString()) # add it to database1
 					datum2 = caffe.proto.caffe_pb2.Datum()
 					datum2.channels = 1
 					datum2.width = 1
 					datum2.height = n_comp
-					datum2.data = np.reshape(des, (n_comp)).tobytes() 
+					datum2.data = np.reshape(des, (n_comp)).tostring() 
 						
 					txn2.put(str_id, datum2.SerializeToString()) # add it to database2
 					k += 1
@@ -379,3 +380,11 @@ def launch(w, h, dirNameArr, outDBNames, data_root="", gpu_id=0, test_db=False, 
 	print '\n\ndone'	
 	t1 = time.time()
 	print '\n\nDatabase writing + optional training time: ', (t1-t0) / 60 / 60, ' hours'
+
+
+if __name__ == '__main__':
+	w = 853
+	h = 480
+	dirNameArr = '/home/hu/calc/TrainAndTest/test_data/CampusLoopDataset/live'
+	outDBNames = ['x1', 'x2']
+	launch(w, h, dirNameArr, outDBNames, gpu_id=-1)

@@ -16,7 +16,7 @@ typedef Eigen::Map<Eigen::VectorXf> Vector; // This is just a bit more sleek
 
 struct descriptor
 {
-	uint32_t id;	
+	uint32_t id;
 	Vector descr;
 	descriptor(size_t id_, Vector descr_) : id(id_), descr(descr_) {}
 	descriptor(size_t id_, float* descr_, int p) : id(id_), descr( Vector(descr_, p, 1) )
@@ -90,14 +90,14 @@ public:
 
 	caffe::Net<float>* autoencoder; // the deploy autoencoder
 	caffe::Blob<float>* autoencoder_input; // The encoder's input blob
-	caffe::Blob<float>* autoencoder_output; // The encoder's input blob
+	caffe::Blob<float>* autoencoder_output; // The encoder's output blob
 
 	// If gpu_id is -1, the cpu will be used
 	DeepLCD(const std::string& network_definition_file="calc_model/deploy.prototxt", const std::string& pre_trained_model_file="calc_model/calc.caffemodel", int gpu_id=-1);
 	
 	~DeepLCD()
 	{
-		delete autoencoder;
+		if(autoencoder != nullptr) delete autoencoder;
 	}
 	
 	// input image, calculate and save image descriptor to database, then return its internal ID

@@ -17,7 +17,6 @@ def smooth_pr(prec, rec):
 	"""
 	Smooths precision recall curve according to TREC standards. Evaluates max precision at each 0.1 recall. Makes the curves look nice and not noisy
 	"""
-
 	n = len(prec)
 	m = 11
 	p_smooth = np.zeros((m), dtype=np.float)
@@ -30,13 +29,13 @@ def smooth_pr(prec, rec):
 
 def check_match(im_lab_k, db_lab, num_include):
 	"""
-	Check if im_lab_k and db_lab are a match, i.e. the two images are less than or equal to
-	num_include frames apart. The correct num_include to use depends on the speed of the camera, both for frame rate as well as physical moving speed.
+	Check if im_lab_k and db_lab are a match, i.e. the two images are less than or equal to num_include frames apart. 
+	The correct num_include to use depends on the speed of the camera, both for frame rate as well as physical moving speed.
 	"""	
 	if num_include == 1:
 		if db_lab ==im_lab_k:
 			return True
-	else:				
+	else:
 		# This assumes that db_lab is a string of numerical characters, which it should be	
 		#print int(db_lab)-num_include/2, "<=", int(im_lab_k), "<=", int(db_lab)+num_include/2, "?"
 		if (int(db_lab)-num_include/2) <= int(im_lab_k) and int(im_lab_k) <= (int(db_lab)+num_include/2):
@@ -471,16 +470,3 @@ def view_forward_pass(im1_fl, im2_fl, net_def_path='proto/deploy.prototxt', net_
 	plt.axis('off')
 	plt.imshow(relu23)
 	plt.show()
-
-
-
-
-
-
-
-
-
-
-
-
-

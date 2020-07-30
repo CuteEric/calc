@@ -89,18 +89,18 @@ query_result DeepLCD::query(const cv::Mat& im, bool add_after)
 
 query_result DeepLCD::query(const descriptor& descr, bool add_after)
 {
-
 	query_result q(-1.0, 0);
-	float s;
 	int i = db.size();
 	for (descriptor d : db)
 	{
-		s = score(d.descr, descr.descr);
+		float s = score(d.descr, descr.descr);
 		if (s > q.score)
 		{
 			q.score = s;
 			q.id = d.id;
-		}	
+		}
+
+		//要从搜索空间中排除的最新帧数,即搜索的范围为(n_exclude, db.size())
 		if (--i == n_exclude)
 			break;
 	}
@@ -130,8 +130,7 @@ const descriptor DeepLCD::calcDescr(const cv::Mat& im_)
 	// This will write the image to the input layer of the net
 	cv::split(im, input_channels);
 	autoencoder->Forward(); // Calculate the forward pass
-	const float* tmp_descr;
-	tmp_descr = autoencoder_output->cpu_data(); 
+	const float* tmp_descr = autoencoder_output->cpu_data(); 
 	int p = autoencoder_output->channels(); // Flattened layer get the major axis in channels dimension
 
 	// We need to copy the data, or it will be overwritten on the next Forward() call
@@ -147,18 +146,3 @@ const descriptor DeepLCD::calcDescr(const cv::Mat& im_)
 }
 
 } // end namespace
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

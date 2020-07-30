@@ -4,8 +4,7 @@ cd DeepLCD && mkdir build && cd build
 # Build caffe in our build directory
 
 #有很多bug，应该替换成最新版本的caffe
-#git clone https://github.com/nmerrill67/caffe.git 
-
+#git clone https://github.com/nmerrill67/caffe.git
 
 # download newest caffe code
 git clone https://github.com/BVLC/caffe

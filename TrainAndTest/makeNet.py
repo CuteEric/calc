@@ -1,9 +1,12 @@
+#! usr/bin/env
+#coding=utf-8
+
 import caffe
 import os
 from shutil import copy, move
 from glob import glob
 import re
-from time import time
+import time
 
 def conv(inpt, ks, stride=1, num_out=1, group=1, pad=0):
 	"""
@@ -84,23 +87,20 @@ def calc(X1_lmdb, X2_lmdb, data_root="", batch_size=256):
 	n.X2_comp_hat = sig(n.fc6) # decoded reduced image vector. Use sig to normalize to [0,1] for better results
 
 	################ Loss #######################################
-
-	n.loss = caffe.layers.EuclideanLoss(n.X2_comp_hat, caffe.layers.Flatten(n.X2)) #special_l2_loss(n.X2_comp_hat, caffe.layers.Flatten(n.X2), n.descriptor)  	
+	n.loss = caffe.layers.EuclideanLoss(n.X2_comp_hat, caffe.layers.Flatten(n.X2))
+	
 	protoTrain = n.to_proto()
 
-	
 	############################# Define the deploy net ###########################
-
 	# We'll use some quick regex to drop the loss layer
-
 	tp_str  = re.split('.*backend: LMDB\n  }\n}', str(protoTrain), maxsplit=2)[2]
 	
 	protoDep="""name: 'calc'
 layer {
-    name: "X1"
-    type: "Input"
-    top: "X1"
-    input_param { shape: { dim: 1 dim: 1 dim: 120 dim: 160 } }
+	name: "X1"
+	type: "Input"
+	top: "X1"
+	input_param { shape: { dim: 1 dim: 1 dim: 120 dim: 160 } }
 }"""
 
 	protoDep += re.split('.*"descriptor"\n}', tp_str)[0] + '  top:  "descriptor"\n}'
@@ -171,7 +171,6 @@ class CaffeSolver:
 			if not(type(value) is str):
 				raise TypeError('All solver parameters must be strings')
 			f.write('%s: %s\n' % (key, value))
-							  
 
 def view_output_size():
 	"""
@@ -207,7 +206,7 @@ def moveModel(model_dir=""):
 	"""
 	Move the model and all of its snapshots to specified directory
 	"""
-	if not os.path.isdir("model/"+model_dir):#判断是否为目录,不是的话,则新建一个目录
+	if not os.path.isdir("model/"+model_dir):
 		os.makedirs("model/"+model_dir)
 	models = glob("*.caffemodel")
 	solverstates = glob("*.solverstate")
@@ -223,8 +222,12 @@ def train(solver_proto_path, snapshot_solver_path=None, init_weights=None, GPU_I
 	"""
 
 	t0 = time.time()
-	caffe.set_mode_gpu()
-	caffe.set_device(GPU_ID)
+	if GPU_ID >= 0:
+		caffe.set_mode_gpu()
+		caffe.set_device(GPU_ID)
+	else:
+		caffe.set_mode_cpu()
+	
 	solver = caffe.get_solver(solver_proto_path)
 	if snapshot_solver_path is not None:
 		solver.solve(snapshot_solver_path) # train from previous solverstate
@@ -238,3 +241,10 @@ def train(solver_proto_path, snapshot_solver_path=None, init_weights=None, GPU_I
 	model_dir = "calc_" +  time.strftime("%d-%m-%Y_%I%M%S")
 	moveModel(model_dir=model_dir) # move all the model files to a directory  
 	print "Moved model to model/"+model_dir
+
+if __name__ == '__main__':
+	outDBNames = ['x1', 'x2']
+	print outDBNames[0], outDBNames[1]
+	create_net(outDBNames[0], outDBNames[1], max_iter='5000', batch_size=4)
+	solver_proto_path = '/home/hu/calc/TrainAndTest/proto/solver.prototxt'
+	train(solver_proto_path, GPU_ID=-1)

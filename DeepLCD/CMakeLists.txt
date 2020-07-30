@@ -116,6 +116,7 @@ target_link_libraries( vary-db-size
 #### Tests ##########################################
 
 option(BUILD_TESTS "Build gtest module and python tests (if python wrappers are built)" ON)
+set(BUILD_TESTS OFF)
 
 if (BUILD_TESTS)
 

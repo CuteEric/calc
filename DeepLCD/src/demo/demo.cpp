@@ -52,6 +52,4 @@ int main(int argc, char** argv)
 		std::cout << "Image " << i++ << " result: " << q << "\n";
 	}
 
-} 
-
-
+}
